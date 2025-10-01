@@ -5,21 +5,25 @@ const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(bodyParser.json());
+
+const productAdminRoutes = require('./routers/admin/products');
+app.use('/admin', productAdminRoutes);
+
+const productRoutes = require('./routers/products');
+app.use(productRoutes);
+
 const sequelize = require('./util/db');
 
+const models = require('./models/index');
+sequelize.models = models;
+
 sequelize
-    .authenticate()
+    .sync()
     .then(() => {
-        console.log('Connection has been established successfully.');
+        console.log('Tabelid on loodud');
+        app.listen(3002);
     })
     .catch(err => {
-        console.error('Unable to connect to the database:', err);
+        console.log(err);
     })
-
-app.get('/', (req, res) => {
-    res.json({ message: 'web shop app' });
-})
-
-app.listen(3002, () => {
-    console.log('server is running on port 3002');
-})
